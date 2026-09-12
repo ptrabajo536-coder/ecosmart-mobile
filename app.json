@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "ECOsmart",
+    "slug": "ecosmart-mobile",
+    "scheme": "ecosmart",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "plugins": [
+      "expo-router"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "co.ecosmart.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#12161B",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "ac0841d1-81ca-4138-ad71-8c1e8cdd0910"
+      }
+    }
+  }
+}
