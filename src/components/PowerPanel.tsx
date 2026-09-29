@@ -13,65 +13,54 @@ export function PowerPanel({ status, sending, onAction }: PowerPanelProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>RELÉ PRINCIPAL</Text>
+      <View style={styles.headingRow}>
+        <View>
+          <Text style={styles.label}>CONTROL DE ILUMINACIÓN</Text>
+          <Text style={styles.heading}>Luces del salón</Text>
+        </View>
+        <View style={[styles.liveBadge, relayOn && styles.liveBadgeOn]}>
+          <View style={[styles.liveDot, relayOn && styles.liveDotOn]} />
+          <Text style={[styles.liveText, relayOn && styles.liveTextOn]}>
+            {relayOn ? "ACTIVAS" : "EN REPOSO"}
+          </Text>
+        </View>
+      </View>
 
-      <Pressable
-        disabled={sending}
-        onPress={() => onAction(relayOn ? "OFF" : "ON")}
-        style={({ pressed }) => [
-          styles.switch,
-          {
-            borderColor: relayOn ? colors.on : colors.primary,
-            backgroundColor: relayOn ? colors.onDim : colors.primaryDim,
-          },
-          sending && styles.disabled,
-          pressed && !sending && styles.pressed,
-        ]}
-      >
-        <Text
-          style={[
-            styles.switchLabel,
-            { color: relayOn ? colors.on : colors.primary },
-          ]}
-        >
-          {sending ? "···" : relayOn ? "ON" : "OFF"}
-        </Text>
-        <Text style={styles.switchHint}>
-          {sending ? "procesando" : "toca para cambiar"}
-        </Text>
-      </Pressable>
+      <View style={[styles.controlCard, relayOn && styles.controlCardOn]}>
+        <View style={styles.controlTop}>
+          <View style={[styles.lampIcon, relayOn && styles.lampIconOn]}>
+            <Text style={styles.lampIconText}>☼</Text>
+          </View>
+          <View style={styles.controlCopy}>
+            <Text style={styles.controlTitle}>{relayOn ? "Iluminación encendida" : "Iluminación apagada"}</Text>
+            <Text style={styles.controlHint}>
+              {sending ? "Aplicando cambio..." : "Controla todas las luces a la vez"}
+            </Text>
+          </View>
+        </View>
 
-      <View style={styles.buttonRow}>
+        <View style={styles.buttonRow}>
         <Pressable
           disabled={sending || relayOn}
           onPress={() => onAction("ON")}
-          style={[
-            styles.smallButton,
-            (sending || relayOn) && styles.disabled,
-          ]}
+          style={({ pressed }) => [styles.actionButton, styles.onButton, (sending || relayOn) && styles.disabled, pressed && styles.pressed]}
         >
-          <Text style={styles.smallButtonLabel}>Encender todas</Text>
+          <Text style={[styles.actionButtonLabel, styles.onButtonLabel]}>ENCENDER</Text>
         </Pressable>
         <Pressable
           disabled={sending || !relayOn}
           onPress={() => onAction("OFF")}
-          style={[
-            styles.smallButton,
-            (sending || !relayOn) && styles.disabled,
-          ]}
+          style={({ pressed }) => [styles.actionButton, styles.offButton, (sending || !relayOn) && styles.disabled, pressed && styles.pressed]}
         >
-          <Text style={styles.smallButtonLabel}>Apagar todas</Text>
+          <Text style={[styles.actionButtonLabel, styles.offButtonLabel]}>APAGAR</Text>
         </Pressable>
+      </View>
       </View>
 
       <View style={styles.readings}>
         <Reading
-          label="encendidas"
-          value={status ? `${status.lights.on}/${status.lights.total}` : "—"}
-        />
-        <Reading
-          label="consumo"
-          value={status ? `${status.power.watts} W` : "—"}
+          label="luz principal"
+          value={relayOn ? "encendida" : "apagada"}
         />
         <Reading label="estado" value={relayOn ? "activo" : "reposo"} />
       </View>
@@ -90,46 +79,43 @@ function Reading({ label, value }: { label: string; value: string }) {
 
 const styles = StyleSheet.create({
   container: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-    alignItems: "center",
-    gap: 16,
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 6,
+    gap: 10,
   },
+  headingRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%" },
   label: {
     fontFamily: fonts.mono,
     fontSize: 11,
     color: colors.textMuted,
     letterSpacing: 0.5,
   },
-  switch: {
-    width: 128,
-    height: 128,
-    borderRadius: 10,
-    borderWidth: 2,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 4,
-  },
-  pressed: { opacity: 0.85 },
-  disabled: { opacity: 0.5 },
-  switchLabel: { fontFamily: fonts.monoMedium, fontSize: 26 },
-  switchHint: { fontFamily: fonts.sans, fontSize: 11, color: colors.textMuted },
-  buttonRow: { flexDirection: "row", gap: 8 },
-  smallButton: {
-    borderWidth: 1,
-    borderColor: colors.primary,
-    backgroundColor: colors.surface,
-    borderRadius: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-  },
-  smallButtonLabel: {
-    fontFamily: fonts.sansMedium,
-    fontSize: 12,
-    color: colors.primary,
-  },
+  heading: { fontFamily: fonts.sansSemiBold, fontSize: 18, color: colors.text, marginTop: 3 },
+  liveBadge: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 6 },
+  liveBadgeOn: { backgroundColor: colors.onDim, borderColor: colors.on },
+  liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.off },
+  liveDotOn: { backgroundColor: colors.on },
+  liveText: { fontFamily: fonts.monoMedium, fontSize: 9, color: colors.textMuted },
+  liveTextOn: { color: colors.on },
+  controlCard: { width: "100%", borderRadius: 12, padding: 14, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  controlCardOn: { backgroundColor: colors.onDim, borderColor: colors.on },
+  controlTop: { flexDirection: "row", alignItems: "center", gap: 13, marginBottom: 18 },
+  lampIcon: { width: 44, height: 44, borderRadius: 12, backgroundColor: colors.primaryDim, alignItems: "center", justifyContent: "center" },
+  lampIconOn: { backgroundColor: colors.on },
+  lampIconText: { fontSize: 25, color: colors.primary },
+  controlCopy: { flex: 1 },
+  controlTitle: { fontFamily: fonts.sansSemiBold, fontSize: 16, color: colors.text },
+  controlHint: { fontFamily: fonts.sans, fontSize: 12, color: colors.textMuted, marginTop: 4 },
+  actionButton: { flex: 1, minHeight: 40, borderRadius: 8, alignItems: "center", justifyContent: "center", borderWidth: 1 },
+  onButton: { backgroundColor: colors.on, borderColor: colors.on },
+  offButton: { backgroundColor: colors.surface, borderColor: colors.border },
+  actionButtonLabel: { fontFamily: fonts.monoMedium, fontSize: 11 },
+  onButtonLabel: { color: colors.surface },
+  offButtonLabel: { color: colors.textMuted },
+  pressed: { opacity: 0.78, transform: [{ scale: 0.98 }] },
+  disabled: { opacity: 0.4 },
+  buttonRow: { flexDirection: "row", gap: 10 },
   readings: {
     flexDirection: "row",
     borderWidth: 1,

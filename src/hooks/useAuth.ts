@@ -1,20 +1,46 @@
 import { useCallback, useEffect, useState } from "react";
 import * as Linking from "expo-linking";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+
+export type UserRole = "student" | "teacher";
 
 interface UseAuthResult {
   session: Session | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<string | null>;
+  userRole: UserRole | null;
+  signIn: (email: string, password: string, role: UserRole) => Promise<string | null>;
   resetPassword: (email: string) => Promise<string | null>;
   updatePassword: (password: string) => Promise<string | null>;
   signUp: (
     email: string,
     password: string,
-    name: string
+    name: string,
+    role: UserRole
   ) => Promise<string | null>;
   signOut: () => Promise<void>;
+}
+
+const ROLE_KEY = "ecosmart-user-role";
+const ADMIN_EMAIL = "josesclashflorez2@gmail.com";
+
+function isAllowedTeacherEmail(email: string) {
+  const normalized = email.trim().toLowerCase();
+
+  if (!normalized) return false;
+  if (normalized === ADMIN_EMAIL) return true;
+
+  return /(maestro|maestra)/i.test(normalized);
+}
+
+async function readStoredRole(): Promise<UserRole | null> {
+  const stored = await AsyncStorage.getItem(ROLE_KEY);
+  return stored === "student" || stored === "teacher" ? stored : null;
+}
+
+async function persistRole(role: UserRole) {
+  await AsyncStorage.setItem(ROLE_KEY, role);
 }
 
 async function handleAuthUrl(url: string) {
@@ -38,6 +64,24 @@ async function handleAuthUrl(url: string) {
 export function useAuth(): UseAuthResult {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
+
+  const applyRoleFromSession = useCallback(async (nextSession: Session | null) => {
+    const sessionRole = nextSession?.user?.user_metadata?.role;
+    const resolvedRole =
+      sessionRole === "student" || sessionRole === "teacher"
+        ? sessionRole
+        : await readStoredRole();
+
+    if (resolvedRole) {
+      setUserRole(resolvedRole);
+      await persistRole(resolvedRole);
+      return;
+    }
+
+    setUserRole(null);
+    await AsyncStorage.removeItem(ROLE_KEY);
+  }, []);
 
   useEffect(() => {
     async function loadSession() {
@@ -46,6 +90,7 @@ export function useAuth(): UseAuthResult {
 
       const { data } = await supabase.auth.getSession();
       setSession(data.session);
+      await applyRoleFromSession(data.session);
       setLoading(false);
     }
 
@@ -56,8 +101,9 @@ export function useAuth(): UseAuthResult {
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, newSession) => {
+      async (_event, newSession) => {
         setSession(newSession);
+        await applyRoleFromSession(newSession);
       }
     );
 
@@ -65,14 +111,23 @@ export function useAuth(): UseAuthResult {
       listener.subscription.unsubscribe();
       linkingSubscription.remove();
     };
-  }, []);
+  }, [applyRoleFromSession]);
 
-  const signIn = useCallback(async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string, role: UserRole) => {
+    if (!isAllowedTeacherEmail(email)) {
+      return "Solo se permiten correos de profesor. Contacta al administrador.";
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    return error ? "Correo o contraseña incorrectos." : null;
+
+    if (error) return "Correo o contraseña incorrectos.";
+
+    await persistRole(role);
+    setUserRole(role);
+    return null;
   }, []);
 
   const resetPassword = useCallback(async (email: string) => {
@@ -89,24 +144,41 @@ export function useAuth(): UseAuthResult {
   }, []);
 
   const signUp = useCallback(
-    async (email: string, password: string, name: string) => {
+    async (email: string, password: string, name: string, role: UserRole) => {
+      if (!isAllowedTeacherEmail(email)) {
+        return "Solo pueden registrarse correos de profesor. La única excepción es el administrador.";
+      }
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: name || null } },
+        options: {
+          data: {
+            full_name: name || null,
+            role,
+          },
+        },
       });
-      return error ? error.message : null;
+
+      if (error) return error.message;
+
+      await persistRole(role);
+      setUserRole(role);
+      return null;
     },
     []
   );
 
   const signOut = useCallback(async () => {
+    await AsyncStorage.removeItem(ROLE_KEY);
+    setUserRole(null);
     await supabase.auth.signOut();
   }, []);
 
   return {
     session,
     loading,
+    userRole,
     signIn,
     resetPassword,
     updatePassword,

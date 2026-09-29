@@ -1,20 +1,24 @@
 import { useState } from "react";
 import { AuthForm } from "@/components/AuthForm";
 import { useAuthContext } from "@/lib/AuthContext";
+import type { UserRole } from "@/hooks/useAuth";
+
+const roleOptions = [
+  { value: "teacher" as const, label: "Profesor", description: "Control total" },
+];
 
 export default function LoginScreen() {
   const { signIn } = useAuthContext();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedRole, setSelectedRole] = useState<UserRole>("teacher");
 
   async function handleSubmit(values: Record<string, string>) {
     setPending(true);
     setError(null);
-    const err = await signIn(values.email ?? "", values.password ?? "");
+    const err = await signIn(values.email ?? "", values.password ?? "", selectedRole);
     setPending(false);
     if (err) setError(err);
-    // Si no hay error, el RouteGuard en _layout.tsx detecta la sesión y
-    // redirige automáticamente al dashboard.
   }
 
   return (
@@ -34,6 +38,11 @@ export default function LoginScreen() {
       footerHref="/register"
       secondaryLinkLabel="¿Olvidaste tu contraseña?"
       secondaryLinkHref="/forgot-password"
+      privacyLinkLabel="Política de privacidad"
+      privacyLinkHref="/privacy-policy"
+      roleOptions={roleOptions}
+      selectedRole={selectedRole}
+      onRoleChange={setSelectedRole}
     />
   );
 }

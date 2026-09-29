@@ -1,19 +1,19 @@
 /** Paleta compartida con el dashboard web de ECOsmart. */
 export const colors = {
-  bg: "#F3F7FB",
+  bg: "#F3F7FC",
   surface: "#FFFFFF",
-  surfaceRaised: "#EEF4FC",
-  border: "#E1E9F3",
-  text: "#17233B",
-  textMuted: "#7D8EA8",
-  primary: "#2864E8",
+  surfaceRaised: "#F5F8FF",
+  border: "#DDE7F6",
+  text: "#1F2B3D",
+  textMuted: "#687892",
+  primary: "#4F7AF5",
   primaryDim: "#EAF1FF",
-  on: "#00A878",
-  onDim: "#E5F8F1",
-  warn: "#F59E0B",
-  warnDim: "#FFF7E4",
-  danger: "#EF4444",
-  off: "#B9C5D5",
+  on: "#2DBA8C",
+  onDim: "#EAFBF6",
+  warn: "#F4B267",
+  warnDim: "#FFF4E6",
+  danger: "#E7787A",
+  off: "#D2DDEA",
 };
 
 export const fonts = {

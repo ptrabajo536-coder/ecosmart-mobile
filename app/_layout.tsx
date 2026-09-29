@@ -15,7 +15,7 @@ import {
 import { AuthProvider, useAuthContext } from "@/lib/AuthContext";
 import { colors } from "@/theme";
 
-const AUTH_ROUTES = ["login", "register", "forgot-password", "reset-password"];
+const AUTH_ROUTES = ["login", "register", "forgot-password", "reset-password", "privacy-policy"];
 
 /**
  * Protege las rutas por sesión, igual que src/proxy.ts en la web:
@@ -57,7 +57,7 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
 }
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     IBMPlexSans_400Regular,
     IBMPlexSans_500Medium,
     IBMPlexSans_600SemiBold,
@@ -65,9 +65,18 @@ export default function RootLayout() {
     IBMPlexMono_500Medium,
   });
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded && !fontError) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.bg }} />
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.bg,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <ActivityIndicator color={colors.on} />
+      </View>
     );
   }
 
