@@ -9,8 +9,15 @@ export default function InstitutionMapScreen() {
   return (
     <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>‹ Salones</Text>
+        <Pressable
+          onPress={() => {
+            if (router.canGoBack()) router.back();
+            else router.replace("/");
+          }}
+          accessibilityRole="button"
+          style={styles.backButton}
+        >
+          <Text style={styles.backText}>‹  Salones</Text>
         </Pressable>
         <Text style={styles.title}>Mapa de la institución</Text>
       </View>
@@ -36,10 +43,12 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   backButton: {
+    minHeight: 44,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
     backgroundColor: colors.danger,
+    justifyContent: "center",
   },
   backText: { fontFamily: fonts.monoMedium, fontSize: 11, color: colors.surface },
   title: { flex: 1, fontFamily: fonts.sansSemiBold, fontSize: 18, color: colors.text },

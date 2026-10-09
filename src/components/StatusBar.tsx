@@ -33,7 +33,9 @@ export function StatusBar({
       <View style={styles.card}>
         <View style={styles.topRow}>
           <Pressable
-            onPress={() => router.push("/rooms")}
+            onPress={() => router.replace("/")}
+            accessibilityRole="button"
+            accessibilityLabel="Volver a mis salones"
             style={({ pressed }) => [styles.headerButton, pressed && styles.buttonPressed]}
           >
             <Text style={styles.back}>‹ salones</Text>
@@ -101,16 +103,16 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   headerButton: {
-    minHeight: 34,
+    minHeight: 44,
     paddingHorizontal: 12,
-    paddingVertical: 7,
+    paddingVertical: 9,
     borderRadius: 9,
     backgroundColor: colors.primary,
     justifyContent: "center",
     alignItems: "center",
   },
   logoutButton: {
-    minHeight: 34,
+    minHeight: 44,
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 9,
@@ -136,6 +138,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 12,
+    gap: 8,
   },
   label: {
     fontFamily: fonts.mono,
@@ -146,14 +149,16 @@ const styles = StyleSheet.create({
   },
   brand: {
     fontFamily: fonts.sansSemiBold,
-    fontSize: 24,
+    fontSize: 22,
     color: colors.text,
     marginTop: 4,
+    flexShrink: 1,
   },
   statusPill: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
+    flexShrink: 0,
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 999,
@@ -175,6 +180,7 @@ const styles = StyleSheet.create({
   statusTextOff: { color: colors.warn },
   metaRow: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: 10,
   },
   metaBox: {

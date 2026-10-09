@@ -47,6 +47,7 @@ export default function ResetPasswordScreen() {
       footerText="¿Recordaste tu contraseña?"
       footerLinkLabel="Inicia sesión"
       footerHref="/login"
+      backHref="/login"
     />
   );
 }

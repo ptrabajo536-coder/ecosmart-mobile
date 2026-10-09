@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Text, View, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthForm } from "@/components/AuthForm";
 import { useAuthContext } from "@/lib/AuthContext";
 import { colors, fonts } from "@/theme";
@@ -24,12 +25,14 @@ export default function ForgotPasswordScreen() {
 
   if (done) {
     return (
-      <View style={styles.doneContainer}>
-        <Text style={styles.doneTitle}>Revisa tu correo</Text>
-        <Text style={styles.doneText}>
-          Te enviamos un enlace para recuperar tu contraseña.
-        </Text>
-      </View>
+      <SafeAreaView style={styles.doneContainer} edges={["top", "bottom"]}>
+        <View style={styles.doneContent}>
+          <Text style={styles.doneTitle}>Revisa tu correo</Text>
+          <Text style={styles.doneText}>
+            Te enviamos un enlace para recuperar tu contraseña.
+          </Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -45,6 +48,7 @@ export default function ForgotPasswordScreen() {
       footerText="¿Ya la recuerdas?"
       footerLinkLabel="Inicia sesión"
       footerHref="/login"
+      backHref="/login"
     />
   );
 }
@@ -56,6 +60,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 32,
+  },
+  doneContent: {
+    alignItems: "center",
     gap: 12,
   },
   doneTitle: { fontFamily: fonts.sansSemiBold, fontSize: 16, color: colors.on },

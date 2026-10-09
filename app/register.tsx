@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthForm } from "@/components/AuthForm";
 import { useAuthContext } from "@/lib/AuthContext";
 import { colors, fonts } from "@/theme";
@@ -35,13 +36,15 @@ export default function RegisterScreen() {
 
   if (done) {
     return (
-      <View style={styles.doneContainer}>
-        <Text style={styles.doneTitle}>Cuenta creada</Text>
-        <Text style={styles.doneText}>
-          Si tu correo requiere confirmación, revísalo antes de iniciar
-          sesión. Si no, ya puedes entrar con tu cuenta.
-        </Text>
-      </View>
+      <SafeAreaView style={styles.doneContainer} edges={["top", "bottom"]}>
+        <View style={styles.doneContent}>
+          <Text style={styles.doneTitle}>Cuenta creada</Text>
+          <Text style={styles.doneText}>
+            Si tu correo requiere confirmación, revísalo antes de iniciar
+            sesión. Si no, ya puedes entrar con tu cuenta.
+          </Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -61,6 +64,7 @@ export default function RegisterScreen() {
       footerText="¿Ya tienes cuenta?"
       footerLinkLabel="Inicia sesión"
       footerHref="/login"
+      backHref="/login"
       privacyLinkLabel="Política de privacidad"
       privacyLinkHref="/privacy-policy"
       roleOptions={roleOptions}
@@ -77,6 +81,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 32,
+  },
+  doneContent: {
+    alignItems: "center",
     gap: 12,
   },
   doneTitle: {

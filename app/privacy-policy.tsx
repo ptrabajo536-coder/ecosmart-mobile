@@ -8,8 +8,8 @@ export default function PrivacyPolicyScreen() {
     <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerCard}>
-          <Link href="/login" style={styles.backLink}>
-            ← Volver
+          <Link href="/login" style={styles.backLink} accessibilityRole="button">
+            ‹  Volver
           </Link>
 
           <Text style={styles.title}>Política de privacidad</Text>
@@ -127,6 +127,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
   },
   backLink: {
+    minHeight: 44,
+    textAlignVertical: "center",
     fontFamily: fonts.sansMedium,
     fontSize: 14,
     color: colors.primary,
@@ -170,6 +172,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
     paddingVertical: 14,
+    minHeight: 48,
     borderRadius: 12,
     overflow: "hidden",
     marginTop: 8,

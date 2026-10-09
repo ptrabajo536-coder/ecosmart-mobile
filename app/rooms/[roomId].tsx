@@ -1,6 +1,6 @@
-import { ScrollView, RefreshControl, StyleSheet, View, Text, Pressable } from "react-native";
+import { BackHandler, ScrollView, RefreshControl, StyleSheet, View, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAuthContext } from "@/lib/AuthContext";
 import { useLightsSystem } from "@/hooks/useLightsSystem";
@@ -36,9 +36,21 @@ export default function RoomDashboardScreen() {
     setRefreshing(false);
   }, [refresh]);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+      setMenuOpen(false);
+      return true;
+    });
+
+    return () => subscription.remove();
+  }, [menuOpen]);
+
   return (
     <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <ScrollView
+        contentContainerStyle={styles.scrollContent}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -68,6 +80,7 @@ export default function RoomDashboardScreen() {
           <Pressable
             onPress={() => setMenuOpen((value) => !value)}
             style={styles.hamburgerButton}
+            accessibilityRole="button"
             accessibilityLabel="Abrir menú"
           >
             <View style={styles.hamburgerLine} />
@@ -169,6 +182,7 @@ export default function RoomDashboardScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
+  scrollContent: { paddingBottom: 16 },
   topBar: {
     paddingHorizontal: 18,
     paddingTop: 12,
@@ -176,8 +190,8 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   hamburgerButton: {
-    width: 44,
-    height: 44,
+    width: 48,
+    height: 48,
     borderRadius: 10,
     backgroundColor: colors.surface,
     borderWidth: 1,

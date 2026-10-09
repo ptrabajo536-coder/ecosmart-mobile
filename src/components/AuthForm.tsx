@@ -9,6 +9,7 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, useRouter } from "expo-router";
 import { colors, fonts } from "@/theme";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -43,6 +44,7 @@ interface AuthFormProps {
   secondaryLinkHref?: "/forgot-password";
   privacyLinkLabel?: string;
   privacyLinkHref?: "/privacy-policy";
+  backHref?: "/login" | "/register";
   roleOptions?: RoleOption[];
   selectedRole?: UserRole;
   onRoleChange?: (role: UserRole) => void;
@@ -63,6 +65,7 @@ export function AuthForm({
   secondaryLinkHref,
   privacyLinkLabel,
   privacyLinkHref,
+  backHref,
   roleOptions,
   selectedRole,
   onRoleChange,
@@ -72,15 +75,31 @@ export function AuthForm({
   const [showPasswordFields, setShowPasswordFields] = useState<Record<string, boolean>>({});
 
   return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={styles.flex} edges={["top", "bottom"]}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+          showsVerticalScrollIndicator={false}
+        >
+        {backHref && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Volver"
+            hitSlop={8}
+            onPress={() => {
+              if (router.canGoBack()) router.back();
+              else router.replace(backHref);
+            }}
+            style={({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed]}
+          >
+            <Text style={styles.backLabel}>‹  Volver</Text>
+          </Pressable>
+        )}
         <View style={styles.header}>
           <BrandLogo />
 
@@ -214,8 +233,9 @@ export function AuthForm({
         <Text style={styles.bottomText}>
           Control inteligente para tu salón
         </Text>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -228,8 +248,24 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: "center",
-    paddingHorizontal: 22,
-    paddingVertical: 36,
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: 520,
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+  },
+  backButton: {
+    minHeight: 44,
+    alignSelf: "flex-start",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+    marginBottom: 4,
+  },
+  backButtonPressed: { opacity: 0.65 },
+  backLabel: {
+    fontFamily: fonts.sansMedium,
+    fontSize: 15,
+    color: colors.primary,
   },
 
   header: {
@@ -280,6 +316,7 @@ const styles = StyleSheet.create({
   },
 
   input: {
+    minHeight: 48,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.bg,
@@ -378,9 +415,10 @@ const styles = StyleSheet.create({
 
   submitButton: {
     marginTop: 4,
+    minHeight: 48,
     backgroundColor: colors.primary,
     borderRadius: 12,
-    paddingVertical: 13,
+    paddingVertical: 12,
     alignItems: "center",
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 6 },
@@ -424,6 +462,7 @@ const styles = StyleSheet.create({
 
   footer: {
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "center",
     marginTop: 22,
   },
